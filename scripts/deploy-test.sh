@@ -4,9 +4,11 @@ set -euo pipefail
 # Deploy the Quadlet to hero and start the service.
 # Stops any existing llama-server service first to free VRAM.
 # Usage: deploy-test.sh [user@host]
+#
+# shellcheck disable=SC2029 # Variables intentionally expand locally for ssh
 
 HOST="${1:-user@hero}"
-QUADLET_DIR="~/.config/containers/systemd"
+QUADLET_DIR='.config/containers/systemd'
 OLD_SERVICE="container-llama-server.service"
 SERVICE="llama-server.service"
 
@@ -20,7 +22,7 @@ sleep 2
 
 # Deploy Quadlet file
 echo "==> Copying Quadlet file..."
-ssh "${HOST}" "mkdir -p ${QUADLET_DIR}"
+ssh "${HOST}" "mkdir -p \$HOME/${QUADLET_DIR}"
 scp quadlet/llama-server.container "${HOST}:${QUADLET_DIR}/llama-server.container"
 ssh "${HOST}" "systemctl --user daemon-reload"
 
