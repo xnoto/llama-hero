@@ -1,0 +1,57 @@
+# llama-server.container — Podman Quadlet unit for llama.cpp inference server
+#
+# Placement (rootless):
+#   ~/.config/containers/systemd/llama-server.container
+#
+# After placing:
+#   systemctl --user daemon-reload
+#   systemctl --user start llama-server.service
+#   systemctl --user enable llama-server.service
+#
+# Generated service name: llama-server.service
+#
+# Podman 4.4.1 (RHEL 9.2) has a very limited Quadlet key set.
+# Most container options are passed via PodmanArgs= to ensure compatibility.
+
+[Unit]
+Description=llama.cpp ROCm inference server
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=docker.io/mixa3607/llama.cpp-gfx906:full-b8667-rocm-6.3.3-20260405173349
+
+PodmanArgs=--name llama-server \
+  --device /dev/kfd \
+  --device /dev/dri \
+  --group-add video \
+  --group-add render \
+  --security-opt label=disable \
+  --security-opt seccomp=unconfined \
+  --ipc=host \
+  -v /home/user/models/gguf:/models:Z \
+  -p 8080:8080 \
+  --health-cmd="curl -sf http://localhost:8080/health || exit 1" \
+  --health-interval=30s \
+  --health-timeout=10s \
+  --health-retries=5 \
+  --health-start-period=120s
+
+Exec=--server \
+  -m /models/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf \
+  --host 0.0.0.0 \
+  --port 8080 \
+  --device ROCm0,ROCm1 \
+  -ngl all \
+  --split-mode layer \
+  --tensor-split 1,1 \
+  -c 131072
+
+[Service]
+Restart=on-failure
+RestartSec=10s
+TimeoutStartSec=600
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

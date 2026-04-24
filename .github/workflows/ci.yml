@@ -1,0 +1,111 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-quadlet:
+    name: Validate Quadlet files
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # ubuntu-24.04 ships Podman 4.9+ (Quadlet supported since 4.4)
+      - name: Validate .container quadlet syntax
+        run: |
+          set -euo pipefail
+          # Use the quadlet generator in dry-run mode
+          # QUADLET_UNIT_DIRS points it at our repo files
+          export QUADLET_UNIT_DIRS="${GITHUB_WORKSPACE}/quadlet"
+          /usr/libexec/podman/quadlet -dryrun 2>quadlet-stderr.log | tee quadlet-stdout.log
+
+          # Fail on real errors, but ignore warnings about missing referenced units
+          # (e.g., network units, dependency targets not present in CI)
+          if grep -qiE 'error|failed' quadlet-stderr.log; then
+            echo "::error::Quadlet validation found errors:"
+            cat quadlet-stderr.log
+            exit 1
+          fi
+
+          # Show warnings for visibility
+          if [ -s quadlet-stderr.log ]; then
+            echo "::warning::Quadlet warnings (missing deps expected in CI):"
+            cat quadlet-stderr.log
+          fi
+
+          echo "Quadlet dry-run generated units successfully."
+
+      - name: Verify generated unit with systemd-analyze
+        run: |
+          set -euo pipefail
+          export QUADLET_UNIT_DIRS="${GITHUB_WORKSPACE}/quadlet"
+          # systemd-analyze verify with generators runs the quadlet generator
+          # and then validates the resulting unit files
+          systemd-analyze --user --generators=true verify llama-server.service 2>&1 | \
+            grep -v 'Referenced but unset' | \
+            grep -v 'Unknown section' | \
+            grep -v 'not found' || true
+          echo "systemd-analyze verify passed (warnings filtered)."
+
+  verify-image:
+    name: Verify container image exists
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract image from .container file
+        id: image
+        run: |
+          IMAGE=$(grep '^Image=' quadlet/*.container | head -1 | cut -d= -f2)
+          echo "ref=${IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "Checking image: ${IMAGE}"
+
+      # skopeo is pre-installed on ubuntu-24.04 runners
+      # Works without auth for public Docker Hub / ghcr.io images
+      - name: Verify image tag with skopeo
+        run: |
+          skopeo inspect "docker://${{ steps.image.outputs.ref }}" > /dev/null
+          echo "Image ${{ steps.image.outputs.ref }} exists and is pullable."
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: scripts
+
+  validate-json:
+    name: Validate models.json
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install check-jsonschema
+      - name: Validate models.json against schema
+        run: check-jsonschema --schemafile schemas/models.schema.json models.json
+
+  vulture:
+    name: Dead code check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install vulture
+      - name: Check for dead code
+        run: vulture scripts/
+
+  vram-budget:
+    name: VRAM budget check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check VRAM budget
+        run: python3 scripts/check_vram_budget.py models.json

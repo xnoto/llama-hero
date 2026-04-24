@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GGUF Model Manifest",
+  "description": "Tracks GGUF model files for llama.cpp serving",
+  "type": "object",
+  "required": ["models"],
+  "properties": {
+    "models": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "file", "size_bytes", "quant", "context_window"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable model name"
+          },
+          "file": {
+            "type": "string",
+            "pattern": "\\.gguf$",
+            "description": "GGUF filename"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "File size in bytes"
+          },
+          "quant": {
+            "type": "string",
+            "enum": ["Q2_K", "Q3_K_S", "Q3_K_M", "Q3_K_L", "Q4_0", "Q4_K_S", "Q4_K_M", "Q5_0", "Q5_K_S", "Q5_K_M", "Q6_K", "Q8_0", "F16", "F32"],
+            "description": "Quantization type"
+          },
+          "context_window": {
+            "type": "integer",
+            "minimum": 512,
+            "description": "Context window size in tokens"
+          },
+          "n_heads": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of attention heads (for KV cache estimation)"
+          },
+          "head_dim": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Dimension per attention head"
+          },
+          "n_layers": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of transformer layers"
+          },
+          "n_kv_heads": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of KV heads (for GQA models, often < n_heads)"
+          },
+          "n_gpu_layers": {
+            "type": "integer",
+            "minimum": -1,
+            "description": "GPU layers to offload (-1 = all). Partial offload spills remaining layers to system RAM."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "gpu": {
+      "type": "object",
+      "properties": {
+        "count": { "type": "integer" },
+        "name": { "type": "string" },
+        "vram_bytes": { "type": "integer" }
+      }
+    },
+    "system_ram_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Total system RAM in bytes (for partial offload budget calculations)"
+    }
+  },
+  "additionalProperties": false
+}

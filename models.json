@@ -1,0 +1,58 @@
+{
+  "gpu": {
+    "count": 2,
+    "name": "AMD Radeon VII (Vega 20 / gfx906)",
+    "vram_bytes": 17163091968
+  },
+  "system_ram_bytes": 137438953472,
+  "models": [
+    {
+      "name": "Qwen3.6-35B-A3B Q4_K_M",
+      "file": "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf",
+      "size_bytes": 21474836480,
+      "quant": "Q4_K_M",
+      "context_window": 131072,
+      "n_heads": 16,
+      "head_dim": 128,
+      "n_layers": 40,
+      "n_kv_heads": 2,
+      "n_gpu_layers": -1
+    },
+    {
+      "name": "Qwen2.5-Coder-32B-Instruct Q5_K_M",
+      "file": "qwen2.5-coder-32b-instruct-q5_k_m.gguf",
+      "size_bytes": 23622320128,
+      "quant": "Q5_K_M",
+      "context_window": 32768,
+      "n_heads": 40,
+      "head_dim": 128,
+      "n_layers": 64,
+      "n_kv_heads": 8,
+      "n_gpu_layers": -1
+    },
+    {
+      "name": "Qwen2.5-Coder-32B-Instruct Q4_K_M",
+      "file": "qwen2.5-coder-32b-instruct-q4_k_m.gguf",
+      "size_bytes": 20401094656,
+      "quant": "Q4_K_M",
+      "context_window": 32768,
+      "n_heads": 40,
+      "head_dim": 128,
+      "n_layers": 64,
+      "n_kv_heads": 8,
+      "n_gpu_layers": -1
+    },
+    {
+      "name": "Qwen2.5-Coder-32B-Instruct Q4_0",
+      "file": "qwen2.5-coder-32b-instruct-q4_0.gguf",
+      "size_bytes": 19327352832,
+      "quant": "Q4_0",
+      "context_window": 32768,
+      "n_heads": 40,
+      "head_dim": 128,
+      "n_layers": 64,
+      "n_kv_heads": 8,
+      "n_gpu_layers": -1
+    }
+  ]
+}
