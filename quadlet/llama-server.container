@@ -45,7 +45,7 @@ Exec=--server \
   -ngl all \
   --split-mode layer \
   --tensor-split 1,1 \
-  -c 131072
+  -c 196608
 
 [Service]
 Restart=on-failure

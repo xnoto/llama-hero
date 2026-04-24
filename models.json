@@ -11,7 +11,7 @@
       "file": "Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf",
       "size_bytes": 21474836480,
       "quant": "Q4_K_M",
-      "context_window": 131072,
+      "context_window": 196608,
       "n_heads": 16,
       "head_dim": 128,
       "n_layers": 40,
