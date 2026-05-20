@@ -36,6 +36,7 @@ ssh "${HOST}" "mkdir -p \$HOME/${QUADLET_DIR} \$HOME/${BUILD_DIR}"
 
 echo "==> Copying Forge proxy files"
 scp container/forge-proxy.Containerfile "${HOST}:${BUILD_DIR}/Containerfile"
+scp container/patch-forge-qwen-system.py "${HOST}:${BUILD_DIR}/patch-forge-qwen-system.py"
 scp quadlet/forge-proxy.container "${HOST}:${QUADLET_DIR}/forge-proxy.container"
 
 echo "==> Building ${IMAGE}"

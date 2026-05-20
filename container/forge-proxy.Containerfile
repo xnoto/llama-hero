@@ -7,6 +7,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir "forge-guardrails==${FORGE_VERSION}"
 
+COPY patch-forge-qwen-system.py /tmp/patch-forge-qwen-system.py
+RUN python /tmp/patch-forge-qwen-system.py \
+    && rm /tmp/patch-forge-qwen-system.py
+
 EXPOSE 8081
 
 CMD ["python", "-m", "forge.proxy", "--help"]

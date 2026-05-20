@@ -78,6 +78,7 @@ Notes:
 - Forge requires Python 3.12+, so it is containerized rather than installed on the RHEL 9.2 host Python.
 - The proxy publishes host port `8081` and reaches the existing llama-server through Podman's `host.containers.internal:8080` alias.
 - Native llama.cpp tool calling via `llama-server --jinja` is intentionally disabled for this Qwen3.6/opencode path. The model template rejects some opencode conversation shapes with `System message must be at the beginning`; Forge therefore uses its fallback guardrails instead.
+- The Forge proxy image patches Forge's OpenAI-message conversion to coalesce all `system` messages into one leading system prompt before forwarding to llama-server. This protects Qwen's GGUF template from opencode's per-turn system messages.
 - The newer `full-b8763` image restarted under the current Qwen3.6 + 224K context deployment. The server is pinned to the prior stable `full-b8667` image until the newer build can be qualified separately.
 
 ### Rollback
