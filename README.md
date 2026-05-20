@@ -78,6 +78,7 @@ Notes:
 - Forge requires Python 3.12+, so it is containerized rather than installed on the RHEL 9.2 host Python.
 - The proxy publishes host port `8081` and reaches the existing llama-server through Podman's `host.containers.internal:8080` alias.
 - Native llama.cpp tool calling generally requires `llama-server --jinja`; that is not enabled here because this change does not alter the existing model server. Validate representative tool workflows through the proxy before making Forge the only client entrypoint.
+- `--reasoning-budget 0` is set to avoid unbounded thinking on newer llama.cpp builds with Qwen3.6, which can otherwise cause long stalls or reload windows for clients.
 
 ### Rollback
 
