@@ -67,3 +67,44 @@ if old not in source:
 
 path.write_text(source.replace(old, new))
 print(f"patched {path}")
+
+
+source = path.read_text()
+
+# Forge v0.6.0 exposes model reasoning text as assistant content before tool
+# calls. OpenCode persists that content and sends it back on the next step,
+# which makes Qwen repeat its own planning text and can destabilize long tool
+# loops. Keep reasoning out of the client-visible transcript.
+source = source.replace(
+    '"content": tool_calls[0].reasoning or None,',
+    '"content": None,',
+)
+
+reasoning_block = '''    # If there's reasoning, send it as a content delta first
+    if tool_calls[0].reasoning:
+        events.append({
+            "id": cmpl_id,
+            "object": "chat.completion.chunk",
+            "model": model,
+            "choices": [{
+                "index": 0,
+                "delta": {"role": "assistant", "content": tool_calls[0].reasoning},
+                "finish_reason": None,
+            }],
+        })
+
+'''
+source = source.replace(reasoning_block, '')
+
+path.write_text(source)
+print(f"patched tool-call reasoning visibility in {path}")
+
+
+server_path = path.with_name("server.py")
+server_source = server_path.read_text()
+server_source = server_source.replace(
+    'await self._send_sse_body(writer, [{"error": error_msg}])',
+    'await self._send_sse_body(writer, [{"error": {"message": error_msg, "type": "proxy_error"}}])',
+)
+server_path.write_text(server_source)
+print(f"patched streaming error shape in {server_path}")
