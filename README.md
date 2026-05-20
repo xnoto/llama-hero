@@ -77,7 +77,7 @@ Notes:
 
 - Forge requires Python 3.12+, so it is containerized rather than installed on the RHEL 9.2 host Python.
 - The proxy publishes host port `8081` and reaches the existing llama-server through Podman's `host.containers.internal:8080` alias.
-- Native llama.cpp tool calling generally requires `llama-server --jinja`; that is not enabled here because this change does not alter the existing model server. Validate representative tool workflows through the proxy before making Forge the only client entrypoint.
+- Native llama.cpp tool calling is enabled with `llama-server --jinja` so Forge can use llama-server's OpenAI-compatible tool-call formatting instead of relying on looser text rescue behavior.
 - The newer `full-b8763` image restarted under the current Qwen3.6 + 224K context deployment. The server is pinned to the prior stable `full-b8667` image until the newer build can be qualified separately.
 
 ### Rollback
