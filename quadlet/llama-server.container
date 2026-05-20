@@ -19,7 +19,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Container]
-Image=docker.io/mixa3607/llama.cpp-gfx906:full-b8763-rocm-6.3.3-20260412003929
+Image=docker.io/mixa3607/llama.cpp-gfx906:full-b8667-rocm-6.3.3-20260405173349
 
 PodmanArgs=--name llama-server \
   --device /dev/kfd \
@@ -41,7 +41,6 @@ Exec=--server \
   -m /models/Qwen_Qwen3.6-35B-A3B-Q4_K_M.gguf \
   --host 0.0.0.0 \
   --port 8080 \
-  --reasoning-budget 0 \
   --device ROCm0,ROCm1 \
   -ngl all \
   --split-mode layer \
