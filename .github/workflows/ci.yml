@@ -54,19 +54,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract image from .container file
+      - name: Extract remote images from .container files
         id: image
         run: |
-          IMAGE=$(grep '^Image=' quadlet/*.container | head -1 | cut -d= -f2)
-          echo "ref=${IMAGE}" >> "$GITHUB_OUTPUT"
-          echo "Checking image: ${IMAGE}"
+          IMAGES=$(grep -h '^Image=' quadlet/*.container | cut -d= -f2 | grep -v '^localhost/' || true)
+          {
+            echo 'refs<<EOF'
+            echo "${IMAGES}"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+          echo "Checking remote images:"
+          echo "${IMAGES}"
 
       # skopeo is pre-installed on ubuntu-24.04 runners
       # Works without auth for public Docker Hub / ghcr.io images
       - name: Verify image tag with skopeo
+        env:
+          IMAGE_REFS: ${{ steps.image.outputs.refs }}
         run: |
-          skopeo inspect "docker://${{ steps.image.outputs.ref }}" > /dev/null
-          echo "Image ${{ steps.image.outputs.ref }} exists and is pullable."
+          while IFS= read -r image; do
+            [ -n "${image}" ] || continue
+            skopeo inspect "docker://${image}" > /dev/null
+            echo "Image ${image} exists and is pullable."
+          done <<< "${IMAGE_REFS}"
 
   shellcheck:
     name: ShellCheck

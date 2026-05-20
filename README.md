@@ -47,6 +47,38 @@ The Quadlet-generated service starts automatically on boot (via `WantedBy=defaul
 make deploy-test    # stops existing service, deploys, starts, polls /health
 ```
 
+### Forge guardrails proxy
+
+[Forge](https://github.com/antoinezambelli/forge) can run as an additive OpenAI-compatible proxy in front of the existing `llama-server`:
+
+```text
+client -> hero:8081 -> forge-proxy -> hero:8080 -> llama-server -> GGUF model
+```
+
+The proxy adds tool-calling guardrails, retry nudges, response rescue, context budgeting, and request serialization without changing the deployed model. This repository intentionally keeps the current `llama-server` model and launch flags unchanged; Forge is deployed as a separate service.
+
+Install/start the proxy:
+
+```sh
+make install-forge-proxy
+```
+
+That target builds `localhost/forge-proxy:0.6.0` on `hero`, installs `quadlet/forge-proxy.container`, restarts `forge-proxy.service`, and polls `http://localhost:8081/health`.
+
+Clients should use:
+
+```text
+http://hero.makeitwork.cloud:8081/v1
+```
+
+instead of direct access to llama-server on `8080`.
+
+Notes:
+
+- Forge requires Python 3.12+, so it is containerized rather than installed on the RHEL 9.2 host Python.
+- The proxy publishes host port `8081` and reaches the existing llama-server through Podman's `host.containers.internal:8080` alias.
+- Native llama.cpp tool calling generally requires `llama-server --jinja`; that is not enabled here because this change does not alter the existing model server. Validate representative tool workflows through the proxy before making Forge the only client entrypoint.
+
 ### Rollback
 
 If the health check fails, `deploy-test.sh` automatically attempts to restart the previous `container-llama-server.service`. The original unit file is archived as `container-llama-server.service.pre-quadlet` in `~/.config/systemd/user/`.
@@ -56,13 +88,17 @@ If the health check fails, `deploy-test.sh` automatically attempts to restart th
 ```
 quadlet/
   llama-server.container   Podman Quadlet unit (deployed to ~/.config/containers/systemd/)
+  forge-proxy.container    Optional Forge proxy Quadlet (deployed to ~/.config/containers/systemd/)
   llama-server.env         Optional environment overrides (ROCm tuning)
+container/
+  forge-proxy.Containerfile  Python 3.12 image with forge-guardrails installed
 models.json                Model manifest (name, file, quant, context, architecture params)
 schemas/
   models.schema.json       JSON Schema for models.json
 scripts/
   check_vram_budget.py     VRAM budget validator (supports partial GPU offload)
   deploy-test.sh           Deploy Quadlet, start service, poll health
+  install-forge-proxy.sh   Build/install/start the Forge proxy service
   cutover.sh               Archive old podman-generate-systemd unit
 ```
 
