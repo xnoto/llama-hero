@@ -16,7 +16,7 @@ Podman Quadlet configuration for a self-hosted [llama.cpp](https://github.com/gg
 
 | Model | Quant | Context | Est. VRAM | Headroom |
 |---|---|---|---|---|
-| Qwen3.6-35B-A3B | Q4_K_M | 128K | ~26 GiB | ~6 GiB (19%) |
+| Qwen3.6-35B-A3B | Q4_K_M | 224K | ~29.5 GiB | ~2.5 GiB (8%) |
 | Qwen2.5-Coder-32B | Q5_K_M | 32K | ~31 GiB | ~1 GiB (3%) |
 | Qwen2.5-Coder-32B | Q4_K_M | 32K | ~28 GiB | ~4 GiB (13%) |
 | Qwen2.5-Coder-32B | Q4_0 | 32K | ~27 GiB | ~5 GiB (16%) |
