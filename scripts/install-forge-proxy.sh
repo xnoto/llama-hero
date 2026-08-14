@@ -9,7 +9,7 @@ set -euo pipefail
 HOST="${1:-user@hero}"
 QUADLET_DIR='.config/containers/systemd'
 BUILD_DIR='.cache/llama-hero/forge-proxy'
-IMAGE='localhost/forge-proxy:0.6.0'
+IMAGE='localhost/forge-proxy:0.9.0'
 SERVICE='forge-proxy.service'
 
 wait_for_chat_ready() {

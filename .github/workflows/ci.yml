@@ -9,7 +9,7 @@ jobs:
     name: Validate Quadlet files
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # ubuntu-24.04 ships Podman 4.9+ (Quadlet supported since 4.4)
       - name: Validate .container quadlet syntax
@@ -52,7 +52,7 @@ jobs:
     name: Verify container image exists
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Extract remote images from .container files
         id: image
@@ -82,7 +82,7 @@ jobs:
     name: ShellCheck
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@2.0.0
         with:
@@ -93,8 +93,8 @@ jobs:
     name: Validate models.json
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install check-jsonschema
@@ -105,8 +105,8 @@ jobs:
     name: Dead code check
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install vulture
@@ -117,6 +117,6 @@ jobs:
     name: VRAM budget check
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check VRAM budget
         run: python3 scripts/check_vram_budget.py models.json

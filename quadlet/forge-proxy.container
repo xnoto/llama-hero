@@ -15,14 +15,14 @@ After=network-online.target llama-server.service
 Wants=network-online.target llama-server.service
 
 [Container]
-Image=localhost/forge-proxy:0.6.0
+Image=localhost/forge-proxy:0.9.0
 
 # Publish Forge on host port 8081. The proxy reaches the existing llama-server
 # through Podman's host.containers.internal alias without changing the
 # llama-server Quadlet.
 PodmanArgs=--name forge-proxy \
   -p 8081:8081 \
-  --health-cmd="curl -sf http://localhost:8081/health || exit 1" \
+  --health-cmd="curl -sf http://localhost:8081/forge/health || exit 1" \
   --health-interval=30s \
   --health-timeout=10s \
   --health-retries=5 \
