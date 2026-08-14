@@ -52,3 +52,5 @@ Do not infer deployed state solely from local files. Inspect the host only when 
 ## Contribution workflow
 
 Work on a feature branch and use Conventional Commits. Validate locally, then let CI perform Quadlet, container image, ShellCheck, dead-code, schema, and VRAM checks. Recheck the working tree after validation. Do not deploy as part of validation.
+The Ubuntu runner does not guarantee Podman is preinstalled, so the Quadlet CI
+job installs it explicitly before invoking `/usr/libexec/podman/quadlet`.
