@@ -32,7 +32,6 @@ jobs:
             exit 1
           fi
 
-          # Show warnings for visibility
           if [ -s quadlet-stderr.log ]; then
             echo "::warning::Quadlet warnings (missing deps expected in CI):"
             cat quadlet-stderr.log
