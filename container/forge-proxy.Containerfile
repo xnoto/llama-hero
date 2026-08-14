@@ -1,6 +1,6 @@
 FROM docker.io/python:3.12-slim
 
-ARG FORGE_VERSION=0.6.0
+ARG FORGE_VERSION=0.9.0
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \

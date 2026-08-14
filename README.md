@@ -63,7 +63,7 @@ Install/start the proxy:
 make install-forge-proxy
 ```
 
-That target builds `localhost/forge-proxy:0.6.0` on `hero`, installs `quadlet/forge-proxy.container`, restarts `forge-proxy.service`, and polls `http://localhost:8081/health`.
+That target builds `localhost/forge-proxy:0.9.0` on `hero`, installs `quadlet/forge-proxy.container`, restarts `forge-proxy.service`, and polls `http://localhost:8081/health`.
 
 Clients should use:
 

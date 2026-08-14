@@ -24,6 +24,11 @@ python3 scripts/check_vram_budget.py models.json
 pre-commit run --all-files
 ```
 
+The pre-commit ShellCheck hook uses a container and therefore needs a working
+Docker daemon. On a host without Docker, run `SKIP=shellcheck pre-commit run
+--all-files` plus the system `shellcheck --severity=warning scripts/*.sh`; CI remains the
+authoritative container-backed check.
+
 The following targets connect to `hero`, copy files, build images, or change user services and require explicit confirmation:
 
 - `make install`
@@ -41,8 +46,11 @@ Do not infer deployed state solely from local files. Inspect the host only when 
 - Podman 4.4 Quadlet supports a limited directive set. Keep unsupported options in `PodmanArgs=` as documented in the container file.
 - Preserve the stable pinned llama.cpp image until a newer image is separately qualified.
 - Forge coalesces system messages for the current Qwen template. Do not enable native `--jinja` tool calling or remove the conversion patch without an integration test.
+- Forge 0.9 separates proxy liveness (`/forge/health`) from forwarded backend readiness (`/health`); use the former for the container health command and the latter when deployment scripts must wait for llama-server.
 - Never commit model files, generated service state, credentials, or host-specific runtime data.
 
 ## Contribution workflow
 
 Work on a feature branch and use Conventional Commits. Validate locally, then let CI perform Quadlet, container image, ShellCheck, dead-code, schema, and VRAM checks. Recheck the working tree after validation. Do not deploy as part of validation.
+The Ubuntu runner does not guarantee Podman is preinstalled, so the Quadlet CI
+job installs it explicitly before invoking `/usr/libexec/podman/quadlet`.
